@@ -3,9 +3,6 @@ import java.io.*;
 public class Tree234 {
     private static Tree234 superTrie = new Tree234();
     public static void main(String [] args){
-
-
-
         String filename = "/usr/share/dict/american-english";
         File file = new File(filename);
         FileInputStream fileInputStream;
@@ -114,7 +111,7 @@ public class Tree234 {
 
         Node remove(String toRemove);
 
-        Node contains(String toFind);
+        boolean contains(String toFind);
 
         NodeType getEnumeration();
 
@@ -252,7 +249,6 @@ public class Tree234 {
     private class RootLeaf2 implements Node{
         private String leftData;
         private String rightData;
-        RootLeaf2(){}
         RootLeaf2(String leftData, String rightData){
             this.leftData = leftData;
             this.rightData = rightData;
@@ -280,14 +276,8 @@ public class Tree234 {
             return this;
         }
         @Override
-        public Node contains(String toFind) {
-            if (rightData.compareTo(toFind) == 0) {
-                return this;
-            }
-            if (leftData.compareTo(toFind) == 0) {
-                return this;
-            }
-            return null;
+        public boolean contains(String toFind) {
+            return rightData.compareTo(toFind) == 0 || leftData.compareTo(toFind) == 0;
         }
 
         @Override
@@ -351,8 +341,8 @@ public class Tree234 {
         }
 
         @Override
-        public Node contains(String toFind) {
-            return null;
+        public boolean contains(String toFind) {
+            return leftData.compareTo(toFind) == 0 || middleData.compareTo(toFind) == 0 || rightData.compareTo(toFind) == 0;
         }
 
         @Override
@@ -429,7 +419,7 @@ public class Tree234 {
         }
 
         @Override
-        public Node contains(String toFind) {
+        public boolean contains(String toFind) {
             int compare = middleData.compareTo(toFind);
             if(compare < 0){
                 return rightChild.contains(toFind);
@@ -437,7 +427,7 @@ public class Tree234 {
             if(compare > 0){
                 return leftChild.contains(toFind);
             }
-            return this;
+            return true;
         }
 
         @Override
@@ -527,8 +517,23 @@ public class Tree234 {
         }
 
         @Override
-        public Node contains(String toFind) {
+        public Node remove(String toRemove) {
             return null;
+        }
+
+
+        @Override
+        public boolean contains(String toFind) {
+            int compareLeft = leftData.compareTo(toFind);
+            int compareRight = rightData.compareTo(toFind);
+            if(compareLeft == 0 || compareRight == 0){
+                return true;
+            }
+            if(compareLeft < 0)
+                return leftChild.contains(toFind);
+            if(compareRight < 0)
+                return middleChild.contains(toFind);
+            return rightChild.contains(toFind);
         }
 
         @Override
@@ -596,8 +601,24 @@ public class Tree234 {
         }
 
         @Override
-        public Node contains(String toFind) {
+        public Node remove(String toRemove) {
             return null;
+        }
+
+        @Override
+        public boolean contains(String toFind) {
+            int compareLeft = leftData.compareTo(toFind);
+            int compareMiddle = middleData.compareTo(toFind);
+            int compareRight = rightData.compareTo(toFind);
+            if(compareLeft == 0 || compareMiddle == 0 || compareRight == 0)
+                return true;
+            if(compareLeft < 0)
+                return leftChild.contains(toFind);
+            if(compareMiddle < 0)
+                return leftMiddleChild.contains(toFind);
+            if(compareRight < 0)
+                return rightMiddleChild.contains(toFind);
+            return rightChild.contains(toFind);
         }
 
         @Override
@@ -679,8 +700,20 @@ public class Tree234 {
         }
 
         @Override
-        public Node contains(String toFind) {
+        public Node remove(String toRemove) {
             return null;
+        }
+
+        @Override
+        public boolean contains(String toFind) {
+            int compare = middleData.compareTo(toFind);
+            if(compare < 0){
+                return rightChild.contains(toFind);
+            }
+            if(compare > 0){
+                return leftChild.contains(toFind);
+            }
+            return true;
         }
 
         @Override
@@ -770,8 +803,22 @@ public class Tree234 {
         }
 
         @Override
-        public Node contains(String toFind) {
+        public Node remove(String toRemove) {
             return null;
+        }
+
+        @Override
+        public boolean contains(String toFind) {
+            int compareLeft = leftData.compareTo(toFind);
+            int compareRight = rightData.compareTo(toFind);
+            if(compareLeft == 0 || compareRight == 0){
+                return true;
+            }
+            if(compareLeft < 0)
+                return leftChild.contains(toFind);
+            if(compareRight < 0)
+                return middleChild.contains(toFind);
+            return rightChild.contains(toFind);
         }
 
         @Override
@@ -838,8 +885,24 @@ public class Tree234 {
         }
 
         @Override
-        public Node contains(String toFind) {
+        public Node remove(String toRemove) {
             return null;
+        }
+
+        @Override
+        public boolean contains(String toFind) {
+            int compareLeft = leftData.compareTo(toFind);
+            int compareMiddle = middleData.compareTo(toFind);
+            int compareRight = rightData.compareTo(toFind);
+            if(compareLeft == 0 || compareMiddle == 0 || compareRight == 0)
+                return true;
+            if(compareLeft < 0)
+                return leftChild.contains(toFind);
+            if(compareMiddle < 0)
+                return leftMiddleChild.contains(toFind);
+            if(compareRight < 0)
+                return rightMiddleChild.contains(toFind);
+            return rightChild.contains(toFind);
         }
 
         @Override
@@ -898,8 +961,13 @@ public class Tree234 {
         }
 
         @Override
-        public Node contains(String toFind) {
+        public Node remove(String toRemove) {
             return null;
+        }
+
+        @Override
+        public boolean contains(String toFind) {
+            return middleData.compareTo(toFind) == 0;
         }
 
         @Override
@@ -951,8 +1019,13 @@ public class Tree234 {
         }
 
         @Override
-        public Node contains(String toFind) {
+        public Node remove(String toRemove) {
             return null;
+        }
+
+        @Override
+        public boolean contains(String toFind) {
+            return leftData.compareTo(toFind) == 0 || rightData.compareTo(toFind) == 0;
         }
 
         @Override
@@ -998,10 +1071,14 @@ public class Tree234 {
             return new ReturnNode(middleData, new Leaf1(leftData), new Leaf1(rightData));
         }
 
+        @Override
+        public Node remove(String toRemove) {
+            return null;
+        }
 
         @Override
-        public Node contains(String toFind) {
-            return null;
+        public boolean contains(String toFind) {
+            return leftData.compareTo(toFind) == 0 || middleData.compareTo(toFind) == 0 || rightData.compareTo(toFind) == 0;
         }
 
         @Override
