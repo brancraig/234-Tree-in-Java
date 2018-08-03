@@ -1,7 +1,7 @@
 import java.io.*;
 
 public class Tree234 {
-    private static Tree234 superTrie = new Tree234();
+    private static Tree234 tree234 = new Tree234();
     public static void main(String [] args){
         String filename = "/usr/share/dict/american-english";
         File file = new File(filename);
@@ -25,7 +25,7 @@ public class Tree234 {
                 do {
                     temp = bufferedReader.readLine();
                     if(temp != null){
-                        superTrie.insertSubstrings(temp);
+                        tree234.insertSubstrings(temp);
                     }
                 }while (temp != null);
                 milliSeconds = System.currentTimeMillis() - milliSeconds;
@@ -38,18 +38,10 @@ public class Tree234 {
             System.out.println(seconds + " seconds to load");
 
         }
-
-       /*
-        for (String string : args){
-            superTrie.add(string);
-            superTrie.displayInOrder();
-        }
-
-        superTrie.displayInOrder();*/
-        System.out.println(superTrie.count() + " entries added.");
-        System.out.println(superTrie.size() + " nodes created.");
-        System.out.println(superTrie.height() + " levels deep.");
-        if(superTrie.verifyBalance()){
+        System.out.println(tree234.count() + " entries added.");
+        System.out.println(tree234.size() + " nodes created.");
+        System.out.println(tree234.height() + " levels deep.");
+        if(tree234.verifyBalance()){
             System.out.println("The tree is balanced.");
         } else {
             System.out.println("The tree is not balanced.");
@@ -92,11 +84,11 @@ public class Tree234 {
 
     private boolean insertSubstrings(String string, int stringLength, int substringSize){
         if(substringSize == stringLength){
-            superTrie.add(string);
+            tree234.add(string);
             return true;
         }else{
             for(int i = 0, j = substringSize + 1; j <= stringLength; ++i, ++j){
-                superTrie.add(string.substring(i,j));
+                tree234.add(string.substring(i,j));
             }
             return insertSubstrings(string, stringLength, ++substringSize);
         }
