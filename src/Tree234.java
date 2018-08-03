@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-
+@SuppressWarnings("unchecked")
 public class Tree234<E> extends TreeSet<E> {
     public static void main(String [] args){
         Tree234<String> tree234 = new Tree234<String>(String::compareTo);
@@ -113,7 +113,7 @@ public class Tree234<E> extends TreeSet<E> {
         return new Object[0];
     }
 
-    //END TreeSet Required Functions.
+    //END TreeSet Required Functions.////////////////
 
 
     public void displayInOrder(){
@@ -413,7 +413,6 @@ public class Tree234<E> extends TreeSet<E> {
         private E middleData;
         private Node leftChild;
         private Node rightChild;
-        Root1(){}
         Root1(E middleData, Node leftChild, Node rightChild){
             this.middleData = middleData;
             this.leftChild = leftChild;
@@ -450,10 +449,11 @@ public class Tree234<E> extends TreeSet<E> {
         public Node remove(E toRemove) {
             int compare = comparator.compare(middleData, toRemove);
             Node returnNode;
-            /*if(compare < 0){
+            if(compare < 0){
                 returnNode = rightChild.remove(toRemove);
-                if(returnNode.getEnumeration() == NodeType.return)
-            }*/
+                if(returnNode.getEnumeration() == NodeType.RETURN)
+                    return null;
+            }
             return null;
         }
 
@@ -1090,7 +1090,6 @@ public class Tree234<E> extends TreeSet<E> {
         private E leftData;
         private E middleData;
         private E rightData;
-        Leaf3(){}
         Leaf3(E leftData, E middleData, E rightData){
             this.leftData = leftData;
             this.middleData = middleData;
