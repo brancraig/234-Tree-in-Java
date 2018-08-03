@@ -1,8 +1,10 @@
 import java.io.*;
+import java.util.*;
 
-public class Tree234 {
-    private static Tree234 tree234 = new Tree234();
+
+public class Tree234<E> extends TreeSet<E> {
     public static void main(String [] args){
+        Tree234<String> tree234 = new Tree234<String>(String::compareTo);
         String filename = "/usr/share/dict/american-english";
         File file = new File(filename);
         FileInputStream fileInputStream;
@@ -25,7 +27,7 @@ public class Tree234 {
                 do {
                     temp = bufferedReader.readLine();
                     if(temp != null){
-                        tree234.insertSubstrings(temp);
+                       SubstringInserter.insertSubstrings(temp, tree234);
                     }
                 }while (temp != null);
                 milliSeconds = System.currentTimeMillis() - milliSeconds;
@@ -51,13 +53,67 @@ public class Tree234 {
         System.exit(0);
     }
     private Node root;
-    private Tree234(){
+    private Comparator comparator;
+    private Tree234(Comparator<? super E> comparator){
+        this.root = new RootLeaf1();
+        this.comparator = comparator;
+    }
 
-        root = new RootLeaf1();
+
+
+    //Begin Container Required Functions://///////
+    @Override
+    public boolean add(E toAdd) {
+        this.root = root.add(toAdd);
+        return true;
     }
-    public void add(String toAdd){
-        root = root.add(toAdd);
+
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        return false;
     }
+
+    @Override
+    public boolean remove(Object o) {
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return null;
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return null;
+    }
+
+    @Override
+    public Object[] toArray() {
+        return new Object[0];
+    }
+
+    //END TreeSet Required Functions.
 
 
     public void displayInOrder(){
@@ -78,32 +134,28 @@ public class Tree234 {
         return 0 != root.verifyBalance();
     }
 
-    public boolean insertSubstrings(String string){
-        return !string.trim().isEmpty() && insertSubstrings(string.toLowerCase(), string.length(),1);
+
+
+    @Override
+    public boolean isEmpty() {
+        return root.getEnumeration() == NodeType.ROOTLEAF1 && root.contains(null);
     }
 
-    private boolean insertSubstrings(String string, int stringLength, int substringSize){
-        if(substringSize == stringLength){
-            tree234.add(string);
-            return true;
-        }else{
-            for(int i = 0, j = substringSize + 1; j <= stringLength; ++i, ++j){
-                tree234.add(string.substring(i,j));
-            }
-            return insertSubstrings(string, stringLength, ++substringSize);
-        }
+    @Override
+    public boolean contains(Object o) {
+        return false;
     }
 
     private enum NodeType {
         ROOTLEAF1, ROOTLEAF2, ROOTLEAF3, ROOT1, ROOT2, ROOT3, LEAF1, LEAF2, LEAF3, BRANCH1, BRANCH2, BRANCH3, RETURN
     }
 
-    private interface Node {
-        Node add(String toAdd);
+    private interface Node<E>{
+        Node add(E toAdd);
 
-        Node remove(String toRemove);
+        Node remove(E toRemove);
 
-        boolean contains(String toFind);
+        boolean contains(E toFind);
 
         NodeType getEnumeration();
 
@@ -120,37 +172,35 @@ public class Tree234 {
 
     }
 
-    private class ReturnNode implements Node {
-        String toAdd;
-        String pushUpData;
+    private class ReturnNode implements Node<E> {
+        E pushUpData;
         Node leftChild;
         Node rightChild;
-        ReturnNode(){}
-        ReturnNode(String pushUpData, Node leftChild, Node rightChild){
+        ReturnNode(E pushUpData, Node leftChild, Node rightChild){
             this.pushUpData = pushUpData;
             this.leftChild = leftChild;
             this.rightChild = rightChild;
         }
 
         @Override
-        public Node add(String toAdd) {
+        public Node add(E toAdd) {
             return this;
         }
 
 
         @Override
-        public Node remove(String toRemove) {
-            if(pushUpData == null){
+        public Node remove(E toRemove) {
+            if(this.pushUpData == null){
                 return this;
             }
-            if(pushUpData.compareTo(toRemove) == 0){
+            if(comparator.compare(this.pushUpData, toRemove) == 0){
                 return null;
             }
             return this;
         }
         @Override
-        public boolean contains(String toFind) {
-            return pushUpData.matches(toFind);}
+        public boolean contains(E toFind) {
+            return comparator.compare(this.pushUpData, toFind) == 0;}
 
         @Override
         public void displayInOrder() {}
@@ -176,46 +226,46 @@ public class Tree234 {
 
     }
 
-    private class RootLeaf1 implements Node {
-        private String middleData;
+    private class RootLeaf1 implements Node<E> {
+        private E middleData;
         RootLeaf1(){
             middleData = null;
         }
-        RootLeaf1(String string){
-            middleData = string;
+        RootLeaf1(E e){
+            middleData = e;
         }
 
         @Override
-        public Node add(String toAdd) {
-            if(middleData == null){
-                middleData = toAdd;
+        public Node add(E toAdd) {
+            if(this.middleData == null){
+                this.middleData = toAdd;
                 return this;
             }
-            int compare = middleData.compareTo(toAdd);
+            int compare = comparator.compare(this.middleData, toAdd);
             if(compare < 0) { return new RootLeaf2(middleData, toAdd);}
             else if(compare > 0) { return new RootLeaf2(toAdd, middleData); }
             return this;
         }
 
         @Override
-        public Node remove(String toRemove) {
+        public Node remove(E toRemove) {
             if(middleData == null){
                 return this;
             }
-            if(middleData.compareTo(toRemove) == 0){
+            if(comparator.compare(middleData, toRemove) == 0){
                 return new RootLeaf1();
             }
             return this;
         }
 
         @Override
-        public boolean contains(String toFind) {
-            return middleData != null && middleData.compareTo(toFind) == 0;
+        public boolean contains(E toFind) {
+            return middleData != null && comparator.compare(this.middleData, toFind) == 0;
         }
 
         @Override
         public void displayInOrder() {
-            System.out.print(middleData);
+            System.out.print(middleData.toString());
         }
 
         @Override
@@ -238,43 +288,43 @@ public class Tree234 {
 
     }
 
-    private class RootLeaf2 implements Node{
-        private String leftData;
-        private String rightData;
-        RootLeaf2(String leftData, String rightData){
+    private class RootLeaf2 implements Node<E>{
+        private E leftData;
+        private E rightData;
+        RootLeaf2(E leftData, E rightData){
             this.leftData = leftData;
             this.rightData = rightData;
         }
 
         @Override
-        public Node add(String toAdd) {
-            int compare = this.rightData.compareTo(toAdd);
+        public Node add(E toAdd) {
+            int compare = comparator.compare(this.rightData, toAdd);
             if(compare < 0){ return new RootLeaf3(leftData, rightData, toAdd); }
             if(compare == 0) { return this; }
-            compare = this.leftData.compareTo(toAdd);
+            compare = comparator.compare(this.leftData, toAdd);
             if(compare < 0){ return new RootLeaf3(leftData, toAdd, rightData); }
             if(compare > 0){ return new RootLeaf3(toAdd, leftData, rightData); }
             return this;
         }
 
         @Override
-        public Node remove(String toRemove) {
-            if(leftData.compareTo(toRemove) == 0){
+        public Node remove(E toRemove) {
+            if(comparator.compare(leftData, toRemove) == 0){
                 return new RootLeaf1(rightData);
             }
-            if(rightData.compareTo(toRemove) == 0){
+            if(comparator.compare(rightData, toRemove) == 0){
                 return new RootLeaf1(leftData);
             }
             return this;
         }
         @Override
-        public boolean contains(String toFind) {
-            return rightData.compareTo(toFind) == 0 || leftData.compareTo(toFind) == 0;
+        public boolean contains(E toFind) {
+            return comparator.compare(rightData, toFind) == 0 || comparator.compare(leftData, toFind) == 0;
         }
 
         @Override
         public void displayInOrder() {
-            System.out.print(leftData + " " + rightData);
+            System.out.print(leftData.toString() + " " + rightData.toString());
         }
 
         @Override
@@ -300,46 +350,43 @@ public class Tree234 {
 
     }
 
-    private class RootLeaf3 implements Node {
-        private String leftData;
-        private String middleData;
-        private String rightData;
-        RootLeaf3(){
-
-        }
-        RootLeaf3(String leftData, String middleData, String rightData){
+    private class RootLeaf3 implements Node<E> {
+        private E leftData;
+        private E middleData;
+        private E rightData;
+        RootLeaf3(E leftData, E middleData, E rightData){
             this.leftData = leftData;
             this.middleData = middleData;
             this.rightData = rightData;
         }
 
         @Override
-        public Node add(String toAdd) {
+        public Node add(E toAdd) {
             return new Root1(middleData, new Leaf1(leftData), new Leaf1(rightData)).add(toAdd);
         }
 
         @Override
-        public Node remove(String toRemove) {
-            if(leftData.compareTo(toRemove) == 0){
+        public Node remove(E toRemove) {
+            if(comparator.compare(leftData,toRemove) == 0){
                 return new RootLeaf2(middleData, rightData);
             }
-            if(middleData.compareTo(toRemove) == 0){
+            if(comparator.compare(middleData, toRemove) == 0){
                 return new RootLeaf2(leftData, rightData);
             }
-            if(rightData.compareTo(toRemove) == 0){
+            if(comparator.compare(rightData, toRemove) == 0){
                 return new RootLeaf2(leftData, middleData);
             }
             return this;
         }
 
         @Override
-        public boolean contains(String toFind) {
-            return leftData.compareTo(toFind) == 0 || middleData.compareTo(toFind) == 0 || rightData.compareTo(toFind) == 0;
+        public boolean contains(E toFind) {
+            return comparator.compare(leftData, toFind) == 0 || comparator.compare(middleData, toFind) == 0 || comparator.compare(rightData, toFind) == 0;
         }
 
         @Override
         public void displayInOrder() {
-            System.out.print(leftData + " " + middleData + " " + rightData);
+            System.out.print(leftData.toString() + " " + middleData.toString() + " " + rightData.toString());
         }
 
         @Override
@@ -362,22 +409,22 @@ public class Tree234 {
         public NodeType getEnumeration() { return NodeType.ROOTLEAF3; }
     }
 
-    private class Root1 implements Node {
-        private String middleData;
+    private class Root1 implements Node<E> {
+        private E middleData;
         private Node leftChild;
         private Node rightChild;
         Root1(){}
-        Root1(String middleData, Node leftChild, Node rightChild){
+        Root1(E middleData, Node leftChild, Node rightChild){
             this.middleData = middleData;
             this.leftChild = leftChild;
             this.rightChild = rightChild;
         }
 
         @Override
-        public Node add(String toAdd) {
+        public Node add(E toAdd) {
             Node returnNode;
             ReturnNode cast;
-            int compare = middleData.compareTo(toAdd);
+            int compare = comparator.compare(middleData, toAdd);
             if(compare < 0){
                 returnNode = rightChild.add(toAdd);
                 if(returnNode.getEnumeration() == NodeType.RETURN){
@@ -400,8 +447,8 @@ public class Tree234 {
         }
 
         @Override
-        public Node remove(String toRemove) {
-            int compare = middleData.compareTo(toRemove);
+        public Node remove(E toRemove) {
+            int compare = comparator.compare(middleData, toRemove);
             Node returnNode;
             /*if(compare < 0){
                 returnNode = rightChild.remove(toRemove);
@@ -411,8 +458,8 @@ public class Tree234 {
         }
 
         @Override
-        public boolean contains(String toFind) {
-            int compare = middleData.compareTo(toFind);
+        public boolean contains(E toFind) {
+            int compare = comparator.compare(middleData, toFind);
             if(compare < 0){
                 return rightChild.contains(toFind);
             }
@@ -425,7 +472,7 @@ public class Tree234 {
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
-            System.out.print(middleData + " ");
+            System.out.print(middleData.toString() + " ");
             rightChild.displayInOrder();
         }
 
@@ -456,14 +503,13 @@ public class Tree234 {
         }
     }
 
-    private class Root2 implements Node {
-        private String leftData;
-        private String rightData;
+    private class Root2 implements Node<E> {
+        private E leftData;
+        private E rightData;
         private Node leftChild;
         private Node middleChild;
         private Node rightChild;
-        Root2(){}
-        Root2(String leftData, String rightData, Node leftChild, Node middleChild, Node rightChild){
+        Root2(E leftData, E rightData, Node leftChild, Node middleChild, Node rightChild){
             this.leftData = leftData;
             this.rightData = rightData;
             this.leftChild = leftChild;
@@ -472,10 +518,10 @@ public class Tree234 {
         }
 
         @Override
-        public Node add(String toAdd) {
+        public Node add(E toAdd) {
             Node returnNode;
             ReturnNode cast;
-            int compare = this.rightData.compareTo(toAdd);
+            int compare = comparator.compare(this.rightData, toAdd);
             if(compare < 0) {
                 returnNode = rightChild.add(toAdd);
                 if (returnNode.getEnumeration() == NodeType.RETURN) {
@@ -486,7 +532,7 @@ public class Tree234 {
                 return this;
             }
             if(compare == 0) { return this; }
-            compare = this.leftData.compareTo(toAdd);
+            compare = comparator.compare(this.leftData, toAdd);
             if(compare < 0){
                 returnNode = middleChild.add(toAdd);
                 if(returnNode.getEnumeration() == NodeType.RETURN){
@@ -509,15 +555,15 @@ public class Tree234 {
         }
 
         @Override
-        public Node remove(String toRemove) {
+        public Node remove(E toRemove) {
             return null;
         }
 
 
         @Override
-        public boolean contains(String toFind) {
-            int compareLeft = leftData.compareTo(toFind);
-            int compareRight = rightData.compareTo(toFind);
+        public boolean contains(E toFind) {
+            int compareLeft = comparator.compare(leftData, toFind);
+            int compareRight = comparator.compare(rightData, toFind);
             if(compareLeft == 0 || compareRight == 0){
                 return true;
             }
@@ -531,9 +577,9 @@ public class Tree234 {
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
-            System.out.print(leftData + " ");
+            System.out.print(leftData.toString() + " ");
             middleChild.displayInOrder();
-            System.out.print(rightData + " ");
+            System.out.print(rightData.toString() + " ");
             rightChild.displayInOrder();
         }
 
@@ -566,16 +612,15 @@ public class Tree234 {
         }
     }
 
-    private class Root3 implements Node {
-        private String leftData;
-        private String middleData;
-        private String rightData;
+    private class Root3 implements Node<E> {
+        private E leftData;
+        private E middleData;
+        private E rightData;
         private Node leftChild;
         private Node leftMiddleChild;
         private Node rightMiddleChild;
         private Node rightChild;
-        Root3(){}
-        Root3(String leftData, String middleData, String rightData, Node leftChild, Node leftMiddleChild, Node
+        Root3(E leftData, E middleData, E rightData, Node leftChild, Node leftMiddleChild, Node
                 rightMiddleChild, Node rightChild){
             this.leftData = leftData;
             this.middleData = middleData;
@@ -587,21 +632,21 @@ public class Tree234 {
         }
 
         @Override
-        public Node add(String toAdd) {
+        public Node add(E toAdd) {
             return new Root1(middleData, new Branch1(leftData, leftChild, leftMiddleChild),
                     new Branch1(rightData, rightMiddleChild, rightChild)).add(toAdd);
         }
 
         @Override
-        public Node remove(String toRemove) {
+        public Node remove(E toRemove) {
             return null;
         }
 
         @Override
-        public boolean contains(String toFind) {
-            int compareLeft = leftData.compareTo(toFind);
-            int compareMiddle = middleData.compareTo(toFind);
-            int compareRight = rightData.compareTo(toFind);
+        public boolean contains(E toFind) {
+            int compareLeft = comparator.compare(leftData, toFind);
+            int compareMiddle = comparator.compare(middleData, toFind);
+            int compareRight = comparator.compare(rightData, toFind);
             if(compareLeft == 0 || compareMiddle == 0 || compareRight == 0)
                 return true;
             if(compareLeft < 0)
@@ -616,11 +661,11 @@ public class Tree234 {
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
-            System.out.print(leftData + " ");
+            System.out.print(leftData.toString() + " ");
             leftMiddleChild.displayInOrder();
-            System.out.print(middleData + " ");
+            System.out.print(middleData.toString() + " ");
             rightMiddleChild.displayInOrder();
-            System.out.print(rightData + " ");
+            System.out.print(rightData.toString() + " ");
             rightChild.displayInOrder();
         }
 
@@ -654,22 +699,21 @@ public class Tree234 {
         }
     }
 
-    private class Branch1 implements Node {
-        private String middleData;
+    private class Branch1 implements Node<E> {
+        private E middleData;
         private Node leftChild;
         private Node rightChild;
-        Branch1(){}
-        Branch1(String middleData, Node leftChild, Node rightChild){
+        Branch1(E middleData, Node leftChild, Node rightChild){
             this.middleData = middleData;
             this.leftChild = leftChild;
             this.rightChild = rightChild;
         }
 
         @Override
-        public Node add(String toAdd) {
+        public Node add(E toAdd) {
             Node returnNode;
             ReturnNode cast;
-            int compare = middleData.compareTo(toAdd);
+            int compare = comparator.compare(middleData, toAdd);
             if(compare < 0){
                 returnNode = rightChild.add(toAdd);
                 if(returnNode.getEnumeration() == NodeType.RETURN){
@@ -692,13 +736,13 @@ public class Tree234 {
         }
 
         @Override
-        public Node remove(String toRemove) {
+        public Node remove(E toRemove) {
             return null;
         }
 
         @Override
-        public boolean contains(String toFind) {
-            int compare = middleData.compareTo(toFind);
+        public boolean contains(E toFind) {
+            int compare = comparator.compare(middleData, toFind);
             if(compare < 0){
                 return rightChild.contains(toFind);
             }
@@ -711,7 +755,7 @@ public class Tree234 {
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
-            System.out.print(middleData + " ");
+            System.out.print(middleData.toString() + " ");
             rightChild.displayInOrder();
         }
 
@@ -742,14 +786,13 @@ public class Tree234 {
         }
     }
 
-    private class Branch2 implements Node {
-        private String leftData;
-        private String rightData;
+    private class Branch2 implements Node<E> {
+        private E leftData;
+        private E rightData;
         private Node leftChild;
         private Node middleChild;
         private Node rightChild;
-        Branch2(){}
-        Branch2(String leftData, String rightData, Node leftChild, Node middleChild, Node rightChild){
+        Branch2(E leftData, E rightData, Node leftChild, Node middleChild, Node rightChild){
             this.leftData = leftData;
             this.rightData = rightData;
             this.leftChild = leftChild;
@@ -758,10 +801,10 @@ public class Tree234 {
         }
 
         @Override
-        public Node add(String toAdd) {
+        public Node add(E toAdd) {
             Node returnNode;
             ReturnNode cast;
-            int compare = this.rightData.compareTo(toAdd);
+            int compare = comparator.compare(this.rightData, toAdd);
             if(compare < 0) {
                 returnNode = rightChild.add(toAdd);
                 if (returnNode.getEnumeration() == NodeType.RETURN) {
@@ -772,7 +815,7 @@ public class Tree234 {
                 return this;
             }
             if(compare == 0) { return this; }
-            compare = this.leftData.compareTo(toAdd);
+            compare = comparator.compare(this.leftData, toAdd);
             if(compare < 0){
                 returnNode = middleChild.add(toAdd);
                 if(returnNode.getEnumeration() == NodeType.RETURN){
@@ -795,14 +838,14 @@ public class Tree234 {
         }
 
         @Override
-        public Node remove(String toRemove) {
+        public Node remove(E toRemove) {
             return null;
         }
 
         @Override
-        public boolean contains(String toFind) {
-            int compareLeft = leftData.compareTo(toFind);
-            int compareRight = rightData.compareTo(toFind);
+        public boolean contains(E toFind) {
+            int compareLeft = comparator.compare(leftData, toFind);
+            int compareRight = comparator.compare(rightData, toFind);
             if(compareLeft == 0 || compareRight == 0){
                 return true;
             }
@@ -816,9 +859,9 @@ public class Tree234 {
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
-            System.out.print(leftData + " ");
+            System.out.print(leftData.toString() + " ");
             middleChild.displayInOrder();
-            System.out.print(rightData + " ");
+            System.out.print(rightData.toString() + " ");
             rightChild.displayInOrder();
         }
 
@@ -850,16 +893,15 @@ public class Tree234 {
         }
     }
 
-    private class Branch3 implements Node {
-        private String leftData;
-        private String middleData;
-        private String rightData;
+    private class Branch3 implements Node<E> {
+        private E leftData;
+        private E middleData;
+        private E rightData;
         private Node leftChild;
         private Node leftMiddleChild;
         private Node rightMiddleChild;
         private Node rightChild;
-        Branch3(){}
-        Branch3(String leftData, String middleData, String rightData, Node leftChild, Node leftMiddleChild, Node
+        Branch3(E leftData, E middleData, E rightData, Node leftChild, Node leftMiddleChild, Node
                 rightMiddleChild, Node rightChild){
             this.leftData = leftData;
             this.middleData = middleData;
@@ -871,21 +913,21 @@ public class Tree234 {
         }
 
         @Override
-        public Node add(String toAdd) {
+        public Node add(E toAdd) {
             return new ReturnNode(middleData, new Branch1(leftData, leftChild, leftMiddleChild),
                     new Branch1(rightData, rightMiddleChild, rightChild));
         }
 
         @Override
-        public Node remove(String toRemove) {
+        public Node remove(E toRemove) {
             return null;
         }
 
         @Override
-        public boolean contains(String toFind) {
-            int compareLeft = leftData.compareTo(toFind);
-            int compareMiddle = middleData.compareTo(toFind);
-            int compareRight = rightData.compareTo(toFind);
+        public boolean contains(E toFind) {
+            int compareLeft = comparator.compare(leftData, toFind);
+            int compareMiddle = comparator.compare(middleData, toFind);
+            int compareRight = comparator.compare(rightData, toFind);
             if(compareLeft == 0 || compareMiddle == 0 || compareRight == 0)
                 return true;
             if(compareLeft < 0)
@@ -937,34 +979,33 @@ public class Tree234 {
         }
     }
 
-    private class Leaf1 implements Node {
-        private String middleData;
-        Leaf1(){}
-        Leaf1(String middleData){
+    private class Leaf1 implements Node<E> {
+        private E middleData;
+        Leaf1(E middleData){
             this.middleData = middleData;
         }
 
         @Override
-        public Node add(String toAdd) {
-            int compare = middleData.compareTo(toAdd);
+        public Node add(E toAdd) {
+            int compare = comparator.compare(middleData, toAdd);
             if(compare < 0) { return new Leaf2(middleData, toAdd);}
             else if(compare > 0) { return new Leaf2(toAdd, middleData); }
             return this;
         }
 
         @Override
-        public Node remove(String toRemove) {
+        public Node remove(E toRemove) {
             return null;
         }
 
         @Override
-        public boolean contains(String toFind) {
-            return middleData.compareTo(toFind) == 0;
+        public boolean contains(E toFind) {
+            return comparator.compare(middleData, toFind) == 0;
         }
 
         @Override
         public void displayInOrder() {
-            System.out.print(middleData + " ");
+            System.out.print(middleData.toString() + " ");
         }
 
         @Override
@@ -989,35 +1030,33 @@ public class Tree234 {
         }
     }
 
-    private class Leaf2 implements Node {
-        private String leftData;
-        private String rightData;
-
-        Leaf2(){}
-        Leaf2(String leftData, String rightData){
+    private class Leaf2 implements Node<E> {
+        private E leftData;
+        private E rightData;
+        Leaf2(E leftData, E rightData){
             this.leftData = leftData;
             this.rightData = rightData;
         }
 
         @Override
-        public Node add(String toAdd) {
-            int compare = this.rightData.compareTo(toAdd);
+        public Node add(E toAdd) {
+            int compare = comparator.compare(this.rightData, toAdd);
             if(compare < 0){ return new Leaf3(leftData, rightData, toAdd); }
             if(compare == 0) { return this; }
-            compare = this.leftData.compareTo(toAdd);
+            compare = comparator.compare(this.leftData, toAdd);
             if(compare < 0){ return new Leaf3(leftData, toAdd, rightData); }
             if(compare > 0){ return new Leaf3(toAdd, leftData, rightData); }
             return this;
         }
 
         @Override
-        public Node remove(String toRemove) {
+        public Node remove(E toRemove) {
             return null;
         }
 
         @Override
-        public boolean contains(String toFind) {
-            return leftData.compareTo(toFind) == 0 || rightData.compareTo(toFind) == 0;
+        public boolean contains(E toFind) {
+            return comparator.compare(leftData, toFind) == 0 || comparator.compare(rightData, toFind) == 0;
         }
 
         @Override
@@ -1047,35 +1086,35 @@ public class Tree234 {
         }
     }
 
-    private class Leaf3 implements Node {
-        private String leftData;
-        private String middleData;
-        private String rightData;
+    private class Leaf3 implements Node<E> {
+        private E leftData;
+        private E middleData;
+        private E rightData;
         Leaf3(){}
-        Leaf3(String leftData, String middleData, String rightData){
+        Leaf3(E leftData, E middleData, E rightData){
             this.leftData = leftData;
             this.middleData = middleData;
             this.rightData = rightData;
         }
 
         @Override
-        public Node add(String toAdd) {
+        public Node add(E toAdd) {
             return new ReturnNode(middleData, new Leaf1(leftData), new Leaf1(rightData));
         }
 
         @Override
-        public Node remove(String toRemove) {
+        public Node remove(E toRemove) {
             return null;
         }
 
         @Override
-        public boolean contains(String toFind) {
-            return leftData.compareTo(toFind) == 0 || middleData.compareTo(toFind) == 0 || rightData.compareTo(toFind) == 0;
+        public boolean contains(E toFind) {
+            return comparator.compare(leftData, toFind) == 0 || comparator.compare(middleData, toFind) == 0 || comparator.compare(rightData, toFind) == 0;
         }
 
         @Override
         public void displayInOrder() {
-            System.out.print(leftData + " " + middleData + " " + rightData + " ");
+            System.out.print(leftData.toString() + " " + middleData.toString() + " " + rightData.toString() + " ");
         }
 
         @Override
