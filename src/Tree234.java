@@ -1,11 +1,14 @@
+/* Brandon Craig, brandonjcraig00@gmail.com */
+
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class Tree234<E> extends TreeSet<E> {
     public static void main(String [] args){
         Tree234<String> tree234 = new Tree234<String>(String::compareTo);
-        String filename = "/usr/share/dict/american-english";
+        String filename = "/usr/share/dict/american-english"; //must be linux/ubuntu
         File file = new File(filename);
         FileInputStream fileInputStream;
         long milliSeconds;
@@ -40,6 +43,7 @@ public class Tree234<E> extends TreeSet<E> {
             System.out.println(seconds + " seconds to load");
 
         }
+        //tree234.displayInOrder();
         System.out.println(tree234.count() + " entries added.");
         System.out.println(tree234.size() + " nodes created.");
         System.out.println(tree234.height() + " levels deep.");
@@ -61,11 +65,12 @@ public class Tree234<E> extends TreeSet<E> {
 
 
 
-    //Begin Container Required Functions://///////
+    //Begin TreeSet Required Functions://///////
     @Override
     public boolean add(E toAdd) {
+        Node oldRoot = this.root;
         this.root = root.add(toAdd);
-        return true;
+        return oldRoot != this.root;
     }
 
     @Override
@@ -104,8 +109,19 @@ public class Tree234<E> extends TreeSet<E> {
     }
 
     @Override
-    public <T> T[] toArray(T[] a) {
-        return null;
+    public <T> T[] toArray(T[] array) {
+        int size = this.root.count();
+        if(array.length < size){
+            array = (T[]) Array.newInstance(array.getClass().getComponentType(), size);
+        }
+        else if(array.length > size)
+            array[size] = null;
+        int i = 0;
+        for(E e : this) {
+            array[i] = (T) e;
+            ++i;
+        }
+        return array;
     }
 
     @Override
@@ -116,20 +132,20 @@ public class Tree234<E> extends TreeSet<E> {
     //END TreeSet Required Functions.////////////////
 
 
-    public void displayInOrder(){
+    private void displayInOrder(){
         root.displayInOrder();
         System.out.println();
     }
 
-    public int count(){
+    private int count(){
         return root.count();
     }
 
     public int size(){ return root.size();}
 
-    public int height() { return root.height();}
+    private int height() { return root.height();}
 
-    public boolean verifyBalance(){
+    private boolean verifyBalance(){
 
         return 0 != root.verifyBalance();
     }
