@@ -4,8 +4,9 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.util.*;
 
+
 @SuppressWarnings("unchecked")
-public class Tree234<E> extends TreeSet<E> {
+public class Tree234<E> implements SortedSet<E> {
     public static void main(String [] args){
         Tree234<String> tree234 = new Tree234<String>(String::compareTo);
         String filename = "/usr/share/dict/american-english"; //must be linux/ubuntu
@@ -44,8 +45,8 @@ public class Tree234<E> extends TreeSet<E> {
 
         }
         //tree234.displayInOrder();
-        System.out.println(tree234.count() + " entries added.");
-        System.out.println(tree234.size() + " nodes created.");
+        System.out.println(tree234.size() + " entries added.");
+        System.out.println(tree234.count() + " nodes created.");
         System.out.println(tree234.height() + " levels deep.");
         if(tree234.verifyBalance()){
             System.out.println("The tree is balanced.");
@@ -65,7 +66,7 @@ public class Tree234<E> extends TreeSet<E> {
 
 
 
-    //Begin TreeSet Required Functions://///////
+    //Begin SortedSet Required Functions://///////
     @Override
     public boolean add(E toAdd) {
         Node oldRoot = this.root;
@@ -76,6 +77,51 @@ public class Tree234<E> extends TreeSet<E> {
     @Override
     public boolean addAll(Collection<? extends E> c) {
         return false;
+    }
+
+    @Override
+    public void clear() {
+        this.root = new RootLeaf1();
+    }
+
+    @Override
+    public Comparator<? super E> comparator() {
+        return this.comparator;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return false;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public E first() {
+        return null;
+    }
+
+    @Override
+    public SortedSet<E> headSet(E toElement) {
+        return null;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return root.getEnumeration() == NodeType.ROOTLEAF1 && root.contains(null);
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return null;
+    }
+
+    @Override
+    public E last() {
+        return null;
     }
 
     @Override
@@ -94,17 +140,17 @@ public class Tree234<E> extends TreeSet<E> {
     }
 
     @Override
-    public boolean containsAll(Collection<?> c) {
-        return false;
+    public Spliterator<E> spliterator() {
+        return null;
     }
 
     @Override
-    public void clear() {
-
+    public SortedSet<E> subSet(E fromElement, E toElement) {
+        return null;
     }
 
     @Override
-    public Iterator<E> iterator() {
+    public SortedSet<E> tailSet(E fromElement) {
         return null;
     }
 
@@ -129,7 +175,7 @@ public class Tree234<E> extends TreeSet<E> {
         return new Object[0];
     }
 
-    //END TreeSet Required Functions.////////////////
+    //END SortedSet Required Functions.////////////////
 
 
     private void displayInOrder(){
@@ -151,17 +197,6 @@ public class Tree234<E> extends TreeSet<E> {
     }
 
 
-
-    @Override
-    public boolean isEmpty() {
-        return root.getEnumeration() == NodeType.ROOTLEAF1 && root.contains(null);
-    }
-
-    @Override
-    public boolean contains(Object o) {
-        return false;
-    }
-
     private enum NodeType {
         ROOTLEAF1, ROOTLEAF2, ROOTLEAF3, ROOT1, ROOT2, ROOT3, LEAF1, LEAF2, LEAF3, BRANCH1, BRANCH2, BRANCH3, RETURN
     }
@@ -169,21 +204,23 @@ public class Tree234<E> extends TreeSet<E> {
     private interface Node<E>{
         Node add(E toAdd);
 
-        Node remove(E toRemove);
-
         boolean contains(E toFind);
-
-        NodeType getEnumeration();
 
         int count();
 
-        int size();
+        void displayInOrder();
+
+        NodeType getEnumeration();
 
         int height();
 
+        Node remove(E toRemove);
+
+        int size();
+
         int verifyBalance();
 
-        void displayInOrder();
+
 
 
     }
@@ -345,11 +382,11 @@ public class Tree234<E> extends TreeSet<E> {
 
         @Override
         public int count() {
-            return 2;
+            return 1;
         }
 
         @Override
-        public int size() { return 1; }
+        public int size() { return 2; }
 
         @Override
         public int height() { return 1; }
@@ -407,11 +444,11 @@ public class Tree234<E> extends TreeSet<E> {
 
         @Override
         public int count() {
-            return 3;
+            return 1;
         }
 
         @Override
-        public int size() { return 1; }
+        public int size() { return 3; }
 
         @Override
         public int height() { return 1; }
@@ -601,12 +638,12 @@ public class Tree234<E> extends TreeSet<E> {
 
         @Override
         public int count() {
-            return 2 + leftChild.count() + middleChild.count() + rightChild.count();
+            return 1 + leftChild.count() + middleChild.count() + rightChild.count();
         }
 
 
         @Override
-        public int size() { return 1 + leftChild.size() + middleChild.size() + rightChild.size();}
+        public int size() { return 2 + leftChild.size() + middleChild.size() + rightChild.size();}
 
         @Override
         public int height() { return 1 + leftChild.height();}
@@ -687,12 +724,12 @@ public class Tree234<E> extends TreeSet<E> {
 
         @Override
         public int count() {
-            return 3 + leftChild.count() + leftMiddleChild.count() + rightMiddleChild.count() + rightChild.count();
+            return 1 + leftChild.count() + leftMiddleChild.count() + rightMiddleChild.count() + rightChild.count();
         }
 
         @Override
         public int size() {
-            return 1 + leftChild.size() + leftMiddleChild.size() +  rightMiddleChild.size() + rightChild.size();}
+            return 3 + leftChild.size() + leftMiddleChild.size() +  rightMiddleChild.size() + rightChild.size();}
 
         @Override
         public int height() { return 1 + leftChild.height();}
@@ -883,11 +920,11 @@ public class Tree234<E> extends TreeSet<E> {
 
         @Override
         public int count() {
-            return 2 + leftChild.count() + middleChild.count() + rightChild.count();
+            return 1 + leftChild.count() + middleChild.count() + rightChild.count();
         }
 
         @Override
-        public int size() { return 1 + leftChild.size() + middleChild.size() + rightChild.size();}
+        public int size() { return 2 + leftChild.size() + middleChild.size() + rightChild.size();}
 
         @Override
         public int height() { return 1 + leftChild.height();}
@@ -968,11 +1005,11 @@ public class Tree234<E> extends TreeSet<E> {
 
         @Override
         public int count() {
-            return 3 + leftChild.count() + leftMiddleChild.count() + rightMiddleChild.count() + rightChild.count();
+            return 1 + leftChild.count() + leftMiddleChild.count() + rightMiddleChild.count() + rightChild.count();
         }
 
         @Override
-        public int size() { return 1 + leftChild.size() + leftMiddleChild.size() +  rightMiddleChild.size() + rightChild.size();}
+        public int size() { return 3 + leftChild.size() + leftMiddleChild.size() +  rightMiddleChild.size() + rightChild.size();}
 
         @Override
         public int height() { return 1 + leftChild.height();}
@@ -1082,11 +1119,11 @@ public class Tree234<E> extends TreeSet<E> {
 
         @Override
         public int count() {
-            return 2;
+            return 1;
         }
 
         @Override
-        public int size() { return 1; }
+        public int size() { return 2; }
 
         @Override
         public int height() { return 1; }
@@ -1134,11 +1171,11 @@ public class Tree234<E> extends TreeSet<E> {
 
         @Override
         public int count() {
-            return 3;
+            return 1;
         }
 
         @Override
-        public int size() { return 1; }
+        public int size() { return 3; }
 
         @Override
         public int height() { return 1; }
