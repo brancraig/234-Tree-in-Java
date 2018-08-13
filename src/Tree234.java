@@ -5,6 +5,14 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 
+/**
+ * An implementation of a Sorted Set Collection, done as a 2-3-4 self-balancing tree. The public class itself acts as a
+ * set of methods controlling a set private Node-class objects internally that generate the behavior expected for each
+ * of the given methods. 
+ * @param <E> A parametrized object that can be stored in this collection. Must have a toCompare function implemented as
+ *           this set creates a total ordering through comparison.
+ */
+
 @SuppressWarnings("unchecked")
 public class Tree234<E> implements SortedSet<E> {
     public static void main(String [] args){
@@ -60,7 +68,7 @@ public class Tree234<E> implements SortedSet<E> {
     private Node root;
     private Comparator comparator;
     private Tree234(Comparator<? super E> comparator){
-        this.root = new RootLeaf1();
+        this.root = new Seed1();
         this.comparator = comparator;
     }
 
@@ -81,7 +89,7 @@ public class Tree234<E> implements SortedSet<E> {
 
     @Override
     public void clear() {
-        this.root = new RootLeaf1();
+        this.root = new Seed1();
     }
 
     @Override
@@ -126,7 +134,12 @@ public class Tree234<E> implements SortedSet<E> {
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        Node newRoot = this.root.remove(o);
+        if(newRoot == this.root) {
+            return false;
+        }
+        this.root = newRoot;
+        return true;
     }
 
     @Override
@@ -279,12 +292,12 @@ public class Tree234<E> implements SortedSet<E> {
 
     }
 
-    private class RootLeaf1 implements Node<E> {
+    private class Seed1 implements Node<E> {
         private E middleData;
-        RootLeaf1(){
+        Seed1(){
             middleData = null;
         }
-        RootLeaf1(E e){
+        Seed1(E e){
             middleData = e;
         }
 
@@ -295,8 +308,8 @@ public class Tree234<E> implements SortedSet<E> {
                 return this;
             }
             int compare = comparator.compare(this.middleData, toAdd);
-            if(compare < 0) { return new RootLeaf2(middleData, toAdd);}
-            else if(compare > 0) { return new RootLeaf2(toAdd, middleData); }
+            if(compare < 0) { return new Seed2(middleData, toAdd);}
+            else if(compare > 0) { return new Seed2(toAdd, middleData); }
             return this;
         }
 
@@ -306,7 +319,7 @@ public class Tree234<E> implements SortedSet<E> {
                 return this;
             }
             if(comparator.compare(middleData, toRemove) == 0){
-                return new RootLeaf1();
+                return new Seed1();
             }
             return this;
         }
@@ -341,10 +354,10 @@ public class Tree234<E> implements SortedSet<E> {
 
     }
 
-    private class RootLeaf2 implements Node<E>{
+    private class Seed2 implements Node<E>{
         private E leftData;
         private E rightData;
-        RootLeaf2(E leftData, E rightData){
+        Seed2(E leftData, E rightData){
             this.leftData = leftData;
             this.rightData = rightData;
         }
@@ -352,21 +365,21 @@ public class Tree234<E> implements SortedSet<E> {
         @Override
         public Node add(E toAdd) {
             int compare = comparator.compare(this.rightData, toAdd);
-            if(compare < 0){ return new RootLeaf3(leftData, rightData, toAdd); }
+            if(compare < 0){ return new Seed3(leftData, rightData, toAdd); }
             if(compare == 0) { return this; }
             compare = comparator.compare(this.leftData, toAdd);
-            if(compare < 0){ return new RootLeaf3(leftData, toAdd, rightData); }
-            if(compare > 0){ return new RootLeaf3(toAdd, leftData, rightData); }
+            if(compare < 0){ return new Seed3(leftData, toAdd, rightData); }
+            if(compare > 0){ return new Seed3(toAdd, leftData, rightData); }
             return this;
         }
 
         @Override
         public Node remove(E toRemove) {
             if(comparator.compare(leftData, toRemove) == 0){
-                return new RootLeaf1(rightData);
+                return new Seed1(rightData);
             }
             if(comparator.compare(rightData, toRemove) == 0){
-                return new RootLeaf1(leftData);
+                return new Seed1(leftData);
             }
             return this;
         }
@@ -403,11 +416,11 @@ public class Tree234<E> implements SortedSet<E> {
 
     }
 
-    private class RootLeaf3 implements Node<E> {
+    private class Seed3 implements Node<E> {
         private E leftData;
         private E middleData;
         private E rightData;
-        RootLeaf3(E leftData, E middleData, E rightData){
+        Seed3(E leftData, E middleData, E rightData){
             this.leftData = leftData;
             this.middleData = middleData;
             this.rightData = rightData;
@@ -421,13 +434,13 @@ public class Tree234<E> implements SortedSet<E> {
         @Override
         public Node remove(E toRemove) {
             if(comparator.compare(leftData,toRemove) == 0){
-                return new RootLeaf2(middleData, rightData);
+                return new Seed2(middleData, rightData);
             }
             if(comparator.compare(middleData, toRemove) == 0){
-                return new RootLeaf2(leftData, rightData);
+                return new Seed2(leftData, rightData);
             }
             if(comparator.compare(rightData, toRemove) == 0){
-                return new RootLeaf2(leftData, middleData);
+                return new Seed2(leftData, middleData);
             }
             return this;
         }
@@ -500,13 +513,6 @@ public class Tree234<E> implements SortedSet<E> {
 
         @Override
         public Node remove(E toRemove) {
-            int compare = comparator.compare(middleData, toRemove);
-            Node returnNode;
-            if(compare < 0){
-                returnNode = rightChild.remove(toRemove);
-                if(returnNode.getEnumeration() == NodeType.RETURN)
-                    return null;
-            }
             return null;
         }
 
@@ -584,7 +590,9 @@ public class Tree234<E> implements SortedSet<E> {
                 rightChild = returnNode;
                 return this;
             }
-            if(compare == 0) { return this; }
+            if(compare == 0) {
+                return this;
+            }
             compare = comparator.compare(this.leftData, toAdd);
             if(compare < 0){
                 returnNode = middleChild.add(toAdd);
@@ -1048,7 +1056,10 @@ public class Tree234<E> implements SortedSet<E> {
 
         @Override
         public Node remove(E toRemove) {
-            return null;
+            if(0 == comparator.compare(middleData, toRemove)){
+                return new ReturnNode(null, null, null);
+            }
+            return this;
         }
 
         @Override
@@ -1104,7 +1115,13 @@ public class Tree234<E> implements SortedSet<E> {
 
         @Override
         public Node remove(E toRemove) {
-            return null;
+            if(comparator.compare(leftData, toRemove) == 0){
+                return new Leaf1(rightData);
+            }
+            if(comparator.compare(rightData, toRemove) == 0){
+                return new Leaf1(leftData);
+            }
+            return this;
         }
 
         @Override
@@ -1156,7 +1173,16 @@ public class Tree234<E> implements SortedSet<E> {
 
         @Override
         public Node remove(E toRemove) {
-            return null;
+            if(comparator.compare(leftData,toRemove) == 0){
+                return new Leaf2(middleData, rightData);
+            }
+            if(comparator.compare(middleData, toRemove) == 0){
+                return new Leaf2(leftData, rightData);
+            }
+            if(comparator.compare(rightData, toRemove) == 0){
+                return new Leaf2(leftData, middleData);
+            }
+            return this;
         }
 
         @Override
