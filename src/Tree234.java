@@ -420,7 +420,6 @@ public class Tree234<E> implements SortedSet<E> {
             return this;
         }
 
-
         @Override
         public Node remove(E toRemove) {
             if(this.pushUpData == null){
@@ -431,6 +430,7 @@ public class Tree234<E> implements SortedSet<E> {
             }
             return this;
         }
+
         @Override
         public boolean contains(E toFind) {
             return comparator.compare(this.pushUpData, toFind) == 0;}
@@ -438,6 +438,10 @@ public class Tree234<E> implements SortedSet<E> {
         @Override
         public void displayInOrder() {}
 
+        /**
+         * counts the number of elements in the node.
+         * @return the number of elements in the node.
+         */
         @Override
         public int count() {
             return 1;
@@ -452,6 +456,10 @@ public class Tree234<E> implements SortedSet<E> {
         @Override
         public int verifyBalance() { return 0; }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.RETURN;
@@ -459,20 +467,25 @@ public class Tree234<E> implements SortedSet<E> {
 
     }
 
+    /**
+     * The class of Node representing either an empty-set, or a set with 1 item in it. Seeds only have data-members and
+     * no children. Unlike other nodes it has an additional constructor that takes no arguments, this constructor
+     * is used to instantiate the structure of the tree before any values have been added.
+     */
     private class Seed1 implements Node<E> {
         private E middleData;
-        Seed1(){
-            middleData = null;
-        }
-        Seed1(E e){
-            middleData = e;
-        }
+        Seed1(){ middleData = null; }
+        Seed1(E e){ middleData = e; }
 
+        /**
+         * Adds an object to an empty Seed or a Seed containing one object.
+         * @param toAdd the element E to be added.
+         * @return if empty, a new Seed1 with the data added. if not empty, a new Seed2 with the data sorted.
+         */
         @Override
         public Node add(E toAdd) {
             if(this.middleData == null){
-                this.middleData = toAdd;
-                return this;
+                return new Seed1(toAdd);
             }
             int compare = comparator.compare(this.middleData, toAdd);
             if(compare < 0) { return new Seed2(middleData, toAdd);}
@@ -480,6 +493,11 @@ public class Tree234<E> implements SortedSet<E> {
             return this;
         }
 
+        /**
+         * Removes and finds an object from a Seed1.
+         * @param toRemove The object to be removed.
+         * @return if toRemove is found, returns a new empty Seed1, otherwise returns the original seed.
+         */
         @Override
         public Node remove(E toRemove) {
             if(middleData == null){
@@ -491,44 +509,84 @@ public class Tree234<E> implements SortedSet<E> {
             return this;
         }
 
+        /**
+         * finds an object in the node.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             return middleData != null && comparator.compare(this.middleData, toFind) == 0;
         }
 
+        /**
+         * displays the object.
+         */
         @Override
         public void displayInOrder() {
             System.out.print(middleData.toString());
         }
 
+        /**
+         * counts the number of nodes in the tree.
+         * @return the number of elements.
+         */
         @Override
         public int count() {
             return 1;
         }
 
+        /**
+         * counts the number of elements in the set.
+         * @return the number of elements.
+         */
         @Override
         public int size() { return 1; }
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1; }
+
 
         @Override
         public int verifyBalance(){return 1;}
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() { return NodeType.SEED1; }
 
 
     }
 
+    /**
+     * The set containing two sorted elements.
+     */
+
     private class Seed2 implements Node<E>{
         private E leftData;
         private E rightData;
+
+        /**
+         * Constructor that sets pre-sorted data members.
+         * @param leftData the data of lesser-ordered value.
+         * @param rightData the data or greater-ordered value.
+         */
         Seed2(E leftData, E rightData){
             this.leftData = leftData;
             this.rightData = rightData;
         }
 
+        /**
+         * Adds a third element to the set.
+         * @param toAdd the element E to be added.
+         * @return a new Seed3 containing three elements.
+         */
         @Override
         public Node add(E toAdd) {
             int compare = comparator.compare(this.rightData, toAdd);
@@ -540,6 +598,11 @@ public class Tree234<E> implements SortedSet<E> {
             return this;
         }
 
+        /**
+         * Removes an object from the node if it is found.
+         * @param toRemove The object to be removed.
+         * @return itself if the object is not found, or a Seed1 with the object removed.
+         */
         @Override
         public Node remove(E toRemove) {
             if(comparator.compare(leftData, toRemove) == 0){
@@ -550,24 +613,45 @@ public class Tree234<E> implements SortedSet<E> {
             }
             return this;
         }
+
+        /**
+         * finds an object in the node.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             return comparator.compare(rightData, toFind) == 0 || comparator.compare(leftData, toFind) == 0;
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             System.out.print(leftData.toString() + " " + rightData.toString());
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1;
         }
 
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 2; }
 
+
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1; }
 
@@ -576,6 +660,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 1;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.SEED2;
@@ -612,24 +700,43 @@ public class Tree234<E> implements SortedSet<E> {
             return this;
         }
 
+        /**
+         * finds an object in the node.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             return comparator.compare(leftData, toFind) == 0 || comparator.compare(middleData, toFind) == 0 || comparator.compare(rightData, toFind) == 0;
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             System.out.print(leftData.toString() + " " + middleData.toString() + " " + rightData.toString());
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1;
         }
 
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 3; }
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1; }
 
@@ -638,6 +745,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 1;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() { return NodeType.SEED3; }
     }
@@ -683,6 +794,11 @@ public class Tree234<E> implements SortedSet<E> {
             return null;
         }
 
+        /**
+         * finds an object in the node or in its descendants through a directed path.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             int compare = comparator.compare(middleData, toFind);
@@ -695,6 +811,9 @@ public class Tree234<E> implements SortedSet<E> {
             return true;
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
@@ -702,14 +821,26 @@ public class Tree234<E> implements SortedSet<E> {
             rightChild.displayInOrder();
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1 + leftChild.count() + rightChild.count();
         }
 
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 1 + leftChild.size() + rightChild.size();}
 
+
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1 + leftChild.height();}
 
@@ -723,6 +854,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 0;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.ROOT1;
@@ -787,7 +922,11 @@ public class Tree234<E> implements SortedSet<E> {
             return null;
         }
 
-
+        /**
+         * finds an object in the node or in its descendants through a directed path.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             int compareLeft = comparator.compare(leftData, toFind);
@@ -802,6 +941,9 @@ public class Tree234<E> implements SortedSet<E> {
             return rightChild.contains(toFind);
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
@@ -811,15 +953,25 @@ public class Tree234<E> implements SortedSet<E> {
             rightChild.displayInOrder();
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1 + leftChild.count() + middleChild.count() + rightChild.count();
         }
 
-
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 2 + leftChild.size() + middleChild.size() + rightChild.size();}
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1 + leftChild.height();}
 
@@ -834,6 +986,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 0;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.ROOT2;
@@ -870,6 +1026,11 @@ public class Tree234<E> implements SortedSet<E> {
             return null;
         }
 
+        /**
+         * finds an object in the node or in its descendants through a directed path.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             int compareLeft = comparator.compare(leftData, toFind);
@@ -886,6 +1047,9 @@ public class Tree234<E> implements SortedSet<E> {
             return rightChild.contains(toFind);
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
@@ -897,15 +1061,26 @@ public class Tree234<E> implements SortedSet<E> {
             rightChild.displayInOrder();
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1 + leftChild.count() + leftMiddleChild.count() + rightMiddleChild.count() + rightChild.count();
         }
 
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() {
             return 3 + leftChild.size() + leftMiddleChild.size() +  rightMiddleChild.size() + rightChild.size();}
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1 + leftChild.height();}
 
@@ -921,6 +1096,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 0;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.ROOT3;
@@ -968,6 +1147,11 @@ public class Tree234<E> implements SortedSet<E> {
             return null;
         }
 
+        /**
+         * finds an object in the node or in its descendants through a directed path.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             int compare = comparator.compare(middleData, toFind);
@@ -980,6 +1164,9 @@ public class Tree234<E> implements SortedSet<E> {
             return true;
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
@@ -987,14 +1174,25 @@ public class Tree234<E> implements SortedSet<E> {
             rightChild.displayInOrder();
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1 + leftChild.count() + rightChild.count();
         }
 
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 1 + leftChild.size() + rightChild.size();}
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1 + leftChild.height();}
 
@@ -1008,6 +1206,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 0;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.BRANCH1;
@@ -1070,6 +1272,11 @@ public class Tree234<E> implements SortedSet<E> {
             return null;
         }
 
+        /**
+         * finds an object in the node or in its descendants through a directed path.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             int compareLeft = comparator.compare(leftData, toFind);
@@ -1084,6 +1291,9 @@ public class Tree234<E> implements SortedSet<E> {
             return rightChild.contains(toFind);
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
@@ -1093,14 +1303,26 @@ public class Tree234<E> implements SortedSet<E> {
             rightChild.displayInOrder();
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1 + leftChild.count() + middleChild.count() + rightChild.count();
         }
 
+
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 2 + leftChild.size() + middleChild.size() + rightChild.size();}
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1 + leftChild.height();}
 
@@ -1115,6 +1337,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 0;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.BRANCH2;
@@ -1151,6 +1377,11 @@ public class Tree234<E> implements SortedSet<E> {
             return null;
         }
 
+        /**
+         * finds an object in the node or in its descendants through a directed path.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             int compareLeft = comparator.compare(leftData, toFind);
@@ -1167,6 +1398,9 @@ public class Tree234<E> implements SortedSet<E> {
             return rightChild.contains(toFind);
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             leftChild.displayInOrder();
@@ -1178,14 +1412,25 @@ public class Tree234<E> implements SortedSet<E> {
             rightChild.displayInOrder();
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1 + leftChild.count() + leftMiddleChild.count() + rightMiddleChild.count() + rightChild.count();
         }
 
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 3 + leftChild.size() + leftMiddleChild.size() +  rightMiddleChild.size() + rightChild.size();}
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1 + leftChild.height();}
 
@@ -1201,6 +1446,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 0;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.BRANCH3;
@@ -1229,11 +1478,19 @@ public class Tree234<E> implements SortedSet<E> {
             return this;
         }
 
+        /**
+         * finds an object in the node.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             return comparator.compare(middleData, toFind) == 0;
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             System.out.print(middleData.toString() + " ");
@@ -1244,9 +1501,17 @@ public class Tree234<E> implements SortedSet<E> {
             return 1;
         }
 
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 1; }
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1; }
 
@@ -1255,6 +1520,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 1;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.LEAF1;
@@ -1291,24 +1560,43 @@ public class Tree234<E> implements SortedSet<E> {
             return this;
         }
 
+        /**
+         * finds an object in the node.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             return comparator.compare(leftData, toFind) == 0 || comparator.compare(rightData, toFind) == 0;
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             System.out.print(leftData + " " + rightData + " ");
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1;
         }
 
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 2; }
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1; }
 
@@ -1317,11 +1605,17 @@ public class Tree234<E> implements SortedSet<E> {
             return 1;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.LEAF2;
         }
     }
+
+
 
     private class Leaf3 implements Node<E> {
         private E leftData;
@@ -1352,24 +1646,43 @@ public class Tree234<E> implements SortedSet<E> {
             return this;
         }
 
+        /**
+         * finds an object in the node.
+         * @param toFind the object to be found in the sorted set.
+         * @return true if found, false if not found.
+         */
         @Override
         public boolean contains(E toFind) {
             return comparator.compare(leftData, toFind) == 0 || comparator.compare(middleData, toFind) == 0 || comparator.compare(rightData, toFind) == 0;
         }
 
+        /**
+         * displays the objects in the tree in order.
+         */
         @Override
         public void displayInOrder() {
             System.out.print(leftData.toString() + " " + middleData.toString() + " " + rightData.toString() + " ");
         }
 
+        /**
+         * counts the number of NODES in the tree object.
+         */
         @Override
         public int count() {
             return 1;
         }
 
+        /**
+         * counts the number of elements in the sorted set.
+         * @return the number of elements in the set.
+         */
         @Override
         public int size() { return 3; }
 
+        /**
+         * gives height of the tree at this point.
+         * @return the height.
+         */
         @Override
         public int height() { return 1; }
 
@@ -1378,6 +1691,10 @@ public class Tree234<E> implements SortedSet<E> {
             return 1;
         }
 
+        /**
+         * Enumerates the node.
+         * @return the node's type, enumerated.
+         */
         @Override
         public NodeType getEnumeration() {
             return NodeType.LEAF3;
